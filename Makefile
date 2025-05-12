@@ -5,9 +5,12 @@
 #				| |    | | |  __/\__ \.
 #				|_|    |_|_|\___||___/
 
-HEADERS			=	lem-ipc.h
+HEADERS			=	lem-ipc.h		\
+					mlx_utils.h
 
-SRCS			=	main.c
+SRCS			=	main.c			\
+					mlx_utils.c		\
+					test_mlx_write_text_to_image.c
 
 LIBFTSRC		=	libftprintf.a libft.a printffd.a
 
@@ -72,9 +75,9 @@ NAME		=	lem-IPC
 
 AR			=	ar rc
 
-FLAGS		=	-lX11 -lXext -L$(MLXDIR)
+FLAGS		=	-lX11 -lXext -L$(MLXDIR) -lm -Imlx_linux -O3 -g
 
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror -g
 
 CC			=	cc
 
@@ -91,21 +94,21 @@ MUTE		:=	1
 #				 | | \ \ |_| | |  __/\__ \.
 #				 |_|  \_\__,_|_|\___||___/
 
-all : header lib ${NAME}
+all : header libft mlxlib ${NAME}
 
-${NAME}: $(OBJS) $(LIBFT)
+${NAME}: $(OBJS) $(LIBFT) ${MLX}
 ifeq ($(MUTE),1)
-	@${CC} ${OBJS} ${LIBFT} -o ${NAME} $(FLAGS) -lm
+	@${CC} ${OBJS} ${LIBFT} ${MLX} -o ${NAME} $(FLAGS)
 	@echo -n "${SUPPR} ${GREEN}	${NAME} : 🆗${DEFAULT}\n"
 else
-	${CC} ${OBJS} ${LIBFT} -o ${NAME} $(FLAGS)
+	${CC} ${OBJS} ${LIBFT} ${MLX} -o ${NAME} $(FLAGS)
 endif
 
 $(OBJSDIR)%.o: %.c ${HEAD}
 	@$(MKDIR) .objs
 	@$(MKDIR) $(dir $@)
 ifeq ($(MUTE),1)
-	@echo -n "${YELLOW}${SUPPR}	⌛ Creating ft_ping objects : $@"
+	@echo -n "${YELLOW}${SUPPR}	⌛ Creating lem-IPC objects : $@"
 	@$(CC) ${CFLAGS} -c $< -o $@ -I$(HEADERSDIR) -Ilibft/includes
 else
 	$(CC) ${CFLAGS} -c $< -o $@ -I$(HEADERSDIR) -Ilibft/includes
@@ -134,9 +137,13 @@ re:
 	@${MAKE} --no-print-directory fclean
 	@${MAKE} --no-print-directory all
 
-lib:
-	@${MAKE} --no-print-directory  --silent -C ${MLXDIR}
-	@echo "\033[1A${SUPPR}${GREEN}	LIBMLX : 🆗${DEFAULT}"
+libft:
 	@${MAKE} --no-print-directory -C ${LIBFTDIR}
 
-.PHONY : re all clean fclean printf lib header
+mlxlib:
+	@if [ ! -f ${MLX} ]; then \
+		${MAKE} --no-print-directory  --silent -C ${MLXDIR}; \
+		echo "\033[1A${SUPPR}${GREEN}	LIBMLX : 🆗${DEFAULT}"; \
+	fi
+
+.PHONY : re clean fclean printf libft mlxlib header
