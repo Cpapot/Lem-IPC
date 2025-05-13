@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 08:56:20 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 16:45:16 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 19:24:38 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,12 @@ int	mlx_init_page(t_mlx_data *mlxData)
 	return (0);
 }
 
+void render_preview_board(int *size, t_mlx_data *mlxData);
+
 void render_page(t_mlx_page *pageData, t_mlx_data *mlxData)
 {
 	set_image_color(&((t_mlx_page *)mlxData->pages->content)->img, pageData->color);
+	render_preview_board(((t_mlx_slider *)((t_mlx_page *)mlxData->pages->content)->sliderLst->content)->value, mlxData);
 	if (mlx_render_all_slider(pageData, mlxData))
 		perror("mlx_render_all_slider"), mlx_free(mlxData);
 	if (mlx_render_all_button(pageData, mlxData))

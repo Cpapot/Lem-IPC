@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 17:16:29 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 13:37:10 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 19:13:06 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 
 typedef struct s_game_data
 {
-	unsigned int		playerToStart;
-	unsigned int		gridSize;
+	int		playerToStart;
+	int		gridSize;
 }	t_game_data;
 
 #endif

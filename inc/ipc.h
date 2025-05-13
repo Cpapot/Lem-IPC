@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 11:46:31 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 17:37:33 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 19:23:48 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include "../libft/includes/libft.h"
 # include "lem-ipc.h"
 
-# define MSG_KEY	0542
+# define MSG_KEY	0527
 # define MAX_TEXT	512
 
 typedef struct	s_message {

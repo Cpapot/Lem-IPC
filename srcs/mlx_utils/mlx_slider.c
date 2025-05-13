@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 15:07:08 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 17:55:42 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 19:15:00 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ static void draw_slider(t_mlx_slider *slider, t_image_data *img)
 				img_mlx_pixel_put(img, circleX + i, circleY + j, slider->circleColor);
 		}
 	}
+	if (slider->name)
+		mlx_write_text_to_image(slider->name, slider->x + slider->width / 2, slider->y + slider->height - circleRadius * 3, 2, true, img);
 	char *value = ft_itoa(*slider->value);
 	if (value)
 	{
@@ -50,7 +52,7 @@ static void draw_slider(t_mlx_slider *slider, t_image_data *img)
 	}
 }
 
-int		mlx_create_slider(t_mlx_page *mlxPage, unsigned int sliderData[10], int *value)
+int		mlx_create_slider(t_mlx_page *mlxPage, unsigned int sliderData[10], int *value, char *name)
 {
 	t_mlx_slider	*slider;
 	t_list		*new;
@@ -58,6 +60,7 @@ int		mlx_create_slider(t_mlx_page *mlxPage, unsigned int sliderData[10], int *va
 	slider = stock_malloc(sizeof(t_mlx_slider), &mlxPage->memlist);
 	if (!slider)
 		return (1);
+	slider->name = name;
 	slider->x = sliderData[0];
 	slider->y = sliderData[1];
 	slider->width = sliderData[2];
@@ -99,7 +102,7 @@ int		mlx_slider_hook(int button, int x, int y, t_mlx_page *page)
 	{
 		int circleY = ((t_mlx_slider *)actual->content)->y + (((t_mlx_slider *)actual->content)->height / 2);
 		int circleRadius = ((t_mlx_slider *)actual->content)->height * 1.5;
-		if (y >= circleY - circleRadius && y <= circleY + circleRadius * 10 && x >= ((t_mlx_slider *)actual->content)->x \
+		if (y >= circleY - circleRadius && y <= circleY + circleRadius && x >= ((t_mlx_slider *)actual->content)->x \
 			&& x <= ((t_mlx_slider *)actual->content)->x + ((t_mlx_slider *)actual->content)->width + ((t_mlx_slider *)actual->content)->stepSize){
 			int newValue = ((x - ((t_mlx_slider *)actual->content)->x) / (((t_mlx_slider *)actual->content)->stepSize)) * ((t_mlx_slider *)actual->content)->step + ((t_mlx_slider *)actual->content)->minValue;
 			if (newValue < ((t_mlx_slider *)actual->content)->minValue)

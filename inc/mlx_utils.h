@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:11:53 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 16:45:28 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 19:10:17 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "../mlx_lin/mlx.h"
 # include "../libft/includes/libft.h"
 # include <stdlib.h>
+# include "lem-ipc.h"
 
 # define WIN_WIDTH 1080
 # define WIN_HEIGHT 720
@@ -40,6 +41,7 @@ typedef struct	s_image_data {
 }			t_image_data;
 
 typedef struct	s_mlx_slider {
+	char			*name; // si [0] == 0 -> pas de nom
 	int				x;
 	int				y;
 	int				width;
@@ -100,7 +102,7 @@ int				check_hover_button(int x, int y, t_mlx_data *mlxData);
 int				mlx_write_text_to_image(char *text, int x, int y, int text_size, bool centered,t_image_data *dest);
 t_image_data	*mlx_clone_image(t_memlist **memlist, void *mlx, t_image_data *src);
 void			set_image_color(t_image_data *img, int color);
-int				mlx_create_slider(t_mlx_page *mlxPage, unsigned int sliderData[10], int *value);
+int				mlx_create_slider(t_mlx_page *mlxPage, unsigned int sliderData[10], int *value, char *name);
 int				mlx_render_all_slider(t_mlx_page *page, t_mlx_data *mlxData);
 int				mlx_slider_hook(int button, int x, int y, t_mlx_page *page);
 void			render_page(t_mlx_page *pageData, t_mlx_data *mlxData);
