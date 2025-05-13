@@ -6,11 +6,12 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 08:52:00 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 10:04:12 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 17:31:29 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/mlx_utils.h"
+#include "../inc/ipc.h"
 
 static void draw_button(t_mlx_button *button, t_image_data *img, bool drawPressed)
 {
@@ -25,9 +26,9 @@ static void draw_button(t_mlx_button *button, t_image_data *img, bool drawPresse
 		while (x < button->x + button->width)
 		{
 			if (drawPressed)
-			img_mlx_pixel_put(img, x, y, button->pressedColor);
+				img_mlx_pixel_put(img, x, y, button->pressedColor);
 			else
-			img_mlx_pixel_put(img, x, y, button->color);
+				img_mlx_pixel_put(img, x, y, button->color);
 			x++;
 		}
 		y++;
@@ -96,6 +97,11 @@ int	mlx_render_all_button(t_mlx_page *page, t_mlx_data *mlxData)
 			((t_mlx_button *)actual->content)->pressedButtonImg = mlx_clone_image(&page->memlist, mlxData->mlx, &page->img);
 			if (!((t_mlx_button *)actual->content)->pressedButtonImg)
 				return 1;
+			draw_button((t_mlx_button *)actual->content, ((t_mlx_button *)actual->content)->pressedButtonImg, true);
+		}
+		else
+		{
+			ft_memcpy(((t_mlx_button *)actual->content)->pressedButtonImg->addr, page->img.addr, WIN_WIDTH * WIN_HEIGHT * (((t_mlx_button *)actual->content)->pressedButtonImg->bits_per_pixel / 8));
 			draw_button((t_mlx_button *)actual->content, ((t_mlx_button *)actual->content)->pressedButtonImg, true);
 		}
 		actual = actual->next;

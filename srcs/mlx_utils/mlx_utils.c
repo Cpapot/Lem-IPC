@@ -6,11 +6,13 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:12:34 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 09:44:52 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 14:10:59 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/mlx_utils.h"
+#include "../inc/ipc.h"
+
 
 // fonction pour ouvir fenetre
 t_mlx_data	*mlx_init_window(void)
@@ -57,6 +59,8 @@ int		mlx_free(t_mlx_data *mlxData)
 		mlx_destroy_window(mlxData->mlx, mlxData->win);
 	if (mlxData->mlx)
 		free(mlxData->mlx);
+	if (mlxData->ipc)
+		ipc_clean(mlxData->ipc);
 	free(mlxData);
 	exit(0);
 	return (0);

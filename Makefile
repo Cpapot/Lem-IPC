@@ -7,9 +7,12 @@
 
 HEADERS			=	lem-ipc.h		\
 					mlx_utils.h		\
-					mlx_font.h
+					mlx_font.h		\
+					ipc.h
 
 SRCS			=	main.c							\
+					menu.c							\
+					ipc.c							\
 					mlx_utils/mlx_utils.c			\
 					mlx_utils/mlx_button.c			\
 					mlx_utils/mlx_colors.c			\
@@ -17,6 +20,7 @@ SRCS			=	main.c							\
 					mlx_utils/mlx_images_utils.c	\
 					mlx_utils/mlx_page.c			\
 					mlx_utils/mlx_text.c			\
+					mlx_utils/mlx_slider.c
 
 LIBFTSRC		=	libftprintf.a libft.a printffd.a
 
