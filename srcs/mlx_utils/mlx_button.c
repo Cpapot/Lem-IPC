@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 08:52:00 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 08:58:39 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 10:04:12 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void draw_button(t_mlx_button *button, t_image_data *img, bool drawPresse
 		}
 		y++;
 	}
-	mlx_write_text_to_image(button->name, button->x, button->y, 2, img);
+	mlx_write_text_to_image(button->name, button->x + button->width / 2, button->y + button->height / 2, 2, true, img);
 }
 
 bool	mlx_create_button(t_mlx_page *mlxPage, unsigned int btData[6], char *name, int (*funct_ptr)(), void *param)

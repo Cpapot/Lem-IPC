@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:11:53 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 09:03:30 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 09:56:30 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void			mlx_hooks_init(t_mlx_data *mlxData);
 int				mlx_render_all_button(t_mlx_page *page, t_mlx_data *mlxData);
 bool			mlx_create_button(t_mlx_page *mlxPage, unsigned int btData[6], char *name, int (*funct_ptr)(), void *param);
 int				check_hover_button(int x, int y, t_mlx_data *mlxData);
-int				mlx_write_text_to_image(char *text, int x, int y, int text_size, t_image_data *dest);
+int				mlx_write_text_to_image(char *text, int x, int y, int text_size, bool centered,t_image_data *dest);
 t_image_data	*mlx_clone_image(t_memlist **memlist, void *mlx, t_image_data *src);
 
 
