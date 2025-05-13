@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 17:15:54 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/12 20:28:55 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 09:17:15 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,30 @@ int test_button1(void *param)
 	return (0);
 }
 
-int test_button2(void *param)
+int test_button2(t_mlx_data *mlxData)
 {
-	(void)param;
-	printf("Button 2 pressed\n");
+	if (mlx_init_page(mlxData))
+		return (ft_putstr_fd("Error: mlx_init_page failed\n", 2), 1);
+
+
+	int color = rgb_to_int(209, 207, 207);
+	for (int i = 0; i < WIN_WIDTH; i++)
+	{
+		for (int j = 0; j < WIN_HEIGHT; j++)
+		{
+			img_mlx_pixel_put(&((t_mlx_page *)mlxData->pages->content)->img, i, j, (int)color);
+		}
+	}
+	// mlx_create_button(mlxData->pages->content, (unsigned int[6]){0, 0, 200, 50, 0xA6A6A6, 0x6B6B6B}, "START", test_button1, NULL);
+	mlx_create_button(mlxData->pages->content, (unsigned int[6]){700, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Exit", mlx_free, mlxData);
+
+	if (mlx_render_all_button(mlxData->pages->content, mlxData))
+	{
+		ft_putstr_fd("Error: mlx_render_all_button failed\n", 2);
+		return (1);
+	}
+
+	img_mlx_put_image_to_window(mlxData, &((t_mlx_page *)mlxData->pages->content)->img);
 	return (0);
 }
 
@@ -38,12 +58,12 @@ int main(void)
 	if (mlx_init_page(mlxData))
 		return (ft_putstr_fd("Error: mlx_init_page failed\n", 2), 1);
 
-	mlx_create_button(mlxData->pages->content, (unsigned int[6]){0, 0, 200, 50, 0x00FF00, 0x0000FF}, "START", test_button1, NULL);
-	mlx_create_button(mlxData->pages->content, (unsigned int[6]){400, 100, 200, 50, 0x00FF00, 0x0000FF}, "STOP", test_button2, NULL);
-	mlx_create_button(mlxData->pages->content, (unsigned int[6]){700, 100, 200, 50, 0x00FF00, 0x0000FF}, "EXIT", mlx_free, mlxData);
+	mlx_create_button(mlxData->pages->content, (unsigned int[6]){200, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Start", test_button1, NULL);
+	mlx_create_button(mlxData->pages->content, (unsigned int[6]){400, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Change page", test_button2, mlxData);
+	mlx_create_button(mlxData->pages->content, (unsigned int[6]){700, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Exit", mlx_free, mlxData);
 
 
-	int color = rgb_to_int(255, 0, 0);
+	int color = rgb_to_int(209, 207, 207);
 	for (int i = 0; i < WIN_WIDTH; i++)
 	{
 		for (int j = 0; j < WIN_HEIGHT; j++)
@@ -56,9 +76,9 @@ int main(void)
 		ft_putstr_fd("Error: mlx_render_all_button failed\n", 2);
 		return (1);
 	}
-	printf("Image created\n");
 	img_mlx_put_image_to_window(mlxData, &((t_mlx_page *)mlxData->pages->content)->img);
 	mlx_hooks_init(mlxData);
+	mlx_loop(mlxData->mlx);
 	//ft_printf("Hello, World!\n");
 
 	// on verifie si la queue de message existe déjà

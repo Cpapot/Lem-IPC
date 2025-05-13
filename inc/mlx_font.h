@@ -1,11 +1,21 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../inc/mlx_utils.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   mlx_font.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/13 09:12:02 by cpapot            #+#    #+#             */
+/*   Updated: 2025/05/13 09:14:07 by cpapot           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+# ifndef MLX_FONT_H
+#  define MLX_FONT_H
 
 // Définition d'une police de caractères simple (structure de base 8x8 pixels)
 // Chaque caractère est représenté par un tableau de 8 octets, chaque bit représentant un pixel
-const unsigned char font_8x8[128][8] = {
+static const unsigned char font_8x8[128][8] = {
     // Caractère ASCII 32 (espace)
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
     // Caractère ASCII 33 (!)
@@ -132,65 +142,4 @@ const unsigned char font_8x8[128][8] = {
     {0x00, 0x10, 0x38, 0x6C, 0xC6, 0xC6, 0xFE, 0x00}
 };
 
-/**
- * Écrit du texte sur une image
- * @param text Texte à écrire (tableau de chaînes)
- * @param x Position X du centre du texte
- * @param y Position Y du centre du texte
- * @param text_size Taille du texte (facteur de zoom)
- * @param dest Image de destination
- * @return 0 si succès, 1 si erreur
- */
-int mlx_write_text_to_image(char *text, int x, int y, int text_size, t_image_data *dest)
-{
-    if (text == NULL || dest == NULL || text_size <= 0)
-        return 1;
-
-    int color = 0xFFFFFF; // Couleur blanche comme demandé
-    int base_width = 8;  // Largeur de base d'un caractère
-    int base_height = 8; // Hauteur de base d'un caractère
-    int char_width = base_width * text_size;
-    int char_height = base_height * text_size;
-    int text_length = strlen(text);
-    int current_x = x;
-    int current_y = y;
-
-    // Parcourir tous les caractères de la chaîne
-    for (int i = 0; i < text_length; i++)
-    {
-        char c = text[i];
-
-        if (c == '\n')
-        {
-            current_x = x;
-            current_y += char_height;
-            continue;
-        }
-
-        for (int row = 0; row < base_height; row++)
-        {
-            for (int col = 0; col < base_width; col++)
-            {
-                // Vérifier si le pixel est activé dans la définition du caractère
-                if (font_8x8[(int)c][row] & (1 << (base_width - 1 - col)))
-                {
-                    // Dessiner le pixel agrandi selon text_size
-                    for (int zoom_y = 0; zoom_y < text_size; zoom_y++)
-                    {
-                        for (int zoom_x = 0; zoom_x < text_size; zoom_x++)
-                        {
-                            int draw_x = current_x + col * text_size + zoom_x;
-                            int draw_y = current_y + row * text_size + zoom_y;
-                            img_mlx_pixel_put(dest, draw_x, draw_y, color);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Avancer la position pour le caractère suivant
-        current_x += char_width;
-    }
-
-    return 0;
-}
+# endif

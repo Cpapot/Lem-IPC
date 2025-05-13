@@ -6,11 +6,17 @@
 #				|_|    |_|_|\___||___/
 
 HEADERS			=	lem-ipc.h		\
-					mlx_utils.h
+					mlx_utils.h		\
+					mlx_font.h
 
-SRCS			=	main.c			\
-					mlx_utils.c		\
-					test_mlx_write_text_to_image.c
+SRCS			=	main.c							\
+					mlx_utils/mlx_utils.c			\
+					mlx_utils/mlx_button.c			\
+					mlx_utils/mlx_colors.c			\
+					mlx_utils/mlx_hook_utils.c		\
+					mlx_utils/mlx_images_utils.c	\
+					mlx_utils/mlx_page.c			\
+					mlx_utils/mlx_text.c			\
 
 LIBFTSRC		=	libftprintf.a libft.a printffd.a
 
