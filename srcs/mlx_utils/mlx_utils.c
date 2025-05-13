@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:12:34 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 09:03:04 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 09:44:52 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ t_mlx_data	*mlx_init_window(void)
 	mlx_data = malloc(sizeof(t_mlx_data));
 	if (!mlx_data)
 		return NULL;
+	mlx_data->mlxMemList = NULL;
+	mlx_data->pages = NULL;
 	mlx_data->mlx = mlx_init();
 	if (!mlx_data->mlx)
 		return NULL;
@@ -35,15 +37,27 @@ t_mlx_data	*mlx_init_window(void)
 // fonction pour liberer la memoire de la mlx
 int		mlx_free(t_mlx_data *mlxData)
 {
-	ft_printf("mlx_free\n");
-	(void)mlxData;
-	// if (mlxData->img.img)
-	// 	mlx_destroy_image(mlxData->mlx, mlxData->img.img);
-	// if (mlxData->win)
-	// 	mlx_destroy_window(mlxData->mlx, mlxData->win);
-	// if (mlxData->mlx)
-	// 	free(mlxData->mlx);
-	// free(mlxData);
+	t_list		*actual = mlxData->pages;
+	while (actual)
+	{
+		t_list	*actualbutton = ((t_mlx_page *)actual->content)->buttonsLst;
+		while (actualbutton)
+		{
+			t_mlx_button *button = (t_mlx_button *)actualbutton->content;
+			if (button->pressedButtonImg)
+				mlx_destroy_image(mlxData->mlx, button->pressedButtonImg->img);
+			actualbutton = actualbutton->next;
+		}
+		mlx_destroy_image(mlxData->mlx, ((t_mlx_page *)actual->content)->img.img);
+		stock_free(&((t_mlx_page *)actual->content)->memlist);
+		actual = actual->next;
+	}
+	stock_free(&mlxData->mlxMemList);
+	if (mlxData->win)
+		mlx_destroy_window(mlxData->mlx, mlxData->win);
+	if (mlxData->mlx)
+		free(mlxData->mlx);
+	free(mlxData);
 	exit(0);
 	return (0);
 }

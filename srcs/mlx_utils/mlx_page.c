@@ -6,11 +6,12 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 08:56:20 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 08:56:36 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/13 09:45:01 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/mlx_utils.h"
+#include <stdio.h>
 
 int	mlx_init_page(t_mlx_data *mlxData)
 {
