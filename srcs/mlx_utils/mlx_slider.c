@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 15:07:08 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 19:15:00 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/19 18:48:00 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,9 +110,24 @@ int		mlx_slider_hook(int button, int x, int y, t_mlx_page *page)
 			if (newValue > ((t_mlx_slider *)actual->content)->maxValue)
 				newValue = ((t_mlx_slider *)actual->content)->maxValue;
 			*((int *)(((t_mlx_slider *)actual->content)->value)) = newValue;
-			render_page(page, page->mlxData);
+			page->render(page, page->mlxData);
 		}
 		actual = actual->next;
 	}
 	return (0);
+}
+
+int *mlx_get_all_slider_value(t_mlx_page *page)
+{
+	t_list		*actual = page->sliderLst;
+
+	int *values = stock_malloc(sizeof(int) * ft_lstsize(page->sliderLst), &page->memlist);
+	if (!values)
+		return (NULL);
+	for (int i = 0; actual; i++)
+	{
+		values[i] = *((int *)(((t_mlx_slider *)actual->content)->value));
+		actual = actual->next;
+	}
+	return (values);
 }

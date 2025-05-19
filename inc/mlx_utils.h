@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:11:53 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 19:10:17 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/19 19:47:11 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "../libft/includes/libft.h"
 # include <stdlib.h>
 # include "lem-ipc.h"
+# include "shared_memory.h"
 
 # define WIN_WIDTH 1080
 # define WIN_HEIGHT 720
@@ -71,24 +72,26 @@ typedef struct s_mlx_button {
 }	t_mlx_button;
 
 typedef struct s_mlx_data {
-	void			*mlx;
-	void			*win;
-	void			*ipc;
-	t_memlist		*mlxMemList;	// stocke les stuct page et list page
-	t_list			*pages;
+	void					*mlx;
+	void					*win;
+	t_shared_data_manager	*shmData;
+	t_memlist				*mlxMemList;	// stocke les stuct page et list page
+	t_list					*pages;
 }			t_mlx_data;
 
 typedef struct s_mlx_page {
+	char			*name;
 	int				color;
 	t_mlx_data		*mlxData;
 	t_list			*buttonsLst;
 	t_list			*sliderLst;
 	t_memlist		*memlist; // stocke uniquement les données de la page on peut le clean avec l'image quand on a plus besoin de la page
 	t_image_data	img;
+	void			(*render)(void *pageData, t_mlx_data *mlxData);
 }	t_mlx_page;
 
 int				mlx_button_hook(int button, int x, int y, t_mlx_page *page);
-int				mlx_init_page(t_mlx_data *mlxData);
+int				mlx_init_page(t_mlx_data *mlxData, char *name);
 void			img_mlx_pixel_put(t_image_data *data, int x, int y, int color);
 void			img_mlx_init(t_mlx_page *pageData, void *mlx);
 t_mlx_data		*mlx_init_window(void);
@@ -105,7 +108,8 @@ void			set_image_color(t_image_data *img, int color);
 int				mlx_create_slider(t_mlx_page *mlxPage, unsigned int sliderData[10], int *value, char *name);
 int				mlx_render_all_slider(t_mlx_page *page, t_mlx_data *mlxData);
 int				mlx_slider_hook(int button, int x, int y, t_mlx_page *page);
-void			render_page(t_mlx_page *pageData, t_mlx_data *mlxData);
-
+void			mlx_free_page(t_mlx_data *mlxData, t_mlx_page *pageData);
+t_mlx_page		*mlx_get_page(t_mlx_data *mlxData, char *name);
+int				*mlx_get_all_slider_value(t_mlx_page *page);
 
 #endif

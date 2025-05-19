@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:12:34 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/13 14:10:59 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/05/19 20:09:47 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,7 @@ int		mlx_free(t_mlx_data *mlxData)
 		mlx_destroy_window(mlxData->mlx, mlxData->win);
 	if (mlxData->mlx)
 		free(mlxData->mlx);
-	if (mlxData->ipc)
-		ipc_clean(mlxData->ipc);
+	remove_semaphore(mlxData->shmData->semid, mlxData->shmData->isHost);
 	free(mlxData);
 	exit(0);
 	return (0);

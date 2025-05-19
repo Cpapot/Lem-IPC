@@ -8,11 +8,14 @@
 HEADERS			=	lem-ipc.h		\
 					mlx_utils.h		\
 					mlx_font.h		\
-					ipc.h
+					ipc.h			\
+					shared_memory.h
 
 SRCS			=	main.c							\
-					menu.c							\
+					menu_page.c						\
+					loading_page.c					\
 					ipc.c							\
+					shared_memory_utils.c			\
 					mlx_utils/mlx_utils.c			\
 					mlx_utils/mlx_button.c			\
 					mlx_utils/mlx_colors.c			\
