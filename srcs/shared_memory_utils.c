@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:34:40 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/19 20:32:26 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/04 16:46:55 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,21 @@ int		sem_signal(int semid)
 
 t_shared_data	*create_or_get_shared_memory(int *shmid, bool create)
 {
-	*shmid = shmget(SHM_KEY, sizeof(t_shared_data), create ? IPC_CREAT | 0666 : 0666);
-	if (*shmid == -1) {
-		perror("shmget"); return NULL;
+	if (create)
+	{
+		*shmid = shmget(SHM_KEY, sizeof(t_shared_data), IPC_CREAT | 0666);
+		if (*shmid == -1 && errno != EEXIST) {
+			perror("shmget"); return NULL;
+		}
 	}
+	else
+	{
+		*shmid = shmget(SHM_KEY, sizeof(t_shared_data), 0666);
+		if (*shmid == -1) {
+			return NULL;
+		}
+	}
+
 	t_shared_data *data = (t_shared_data *)shmat(*shmid, NULL, 0);
 	if (data == (t_shared_data *)-1) {
 		perror("shmat"); return NULL;
@@ -38,18 +49,18 @@ t_shared_data	*create_or_get_shared_memory(int *shmid, bool create)
 	return data;
 }
 
-void		clean_shared_memory(int shmid, int semid, t_shared_data *data, bool isHost)
+void		clean_shared_memory(int shmid, t_shared_data *data, bool isHost)
 {
 	shmdt(data);
 	if (isHost) {
 		shmctl(shmid, IPC_RMID, NULL);
-		semctl(semid, 0, IPC_RMID);
 	}
 }
 
 int		write_game_rules(t_shared_data *data, int semid, int playerCount, int boardSize, int speed, t_memlist **mem)
 {
 	data->gameStarted = false;
+	data->isFinish = false;
 	data->boardSize = boardSize;
 	data->playerCount = playerCount;
 	data->connectedPlayers = 1;
@@ -57,7 +68,8 @@ int		write_game_rules(t_shared_data *data, int semid, int playerCount, int board
 
 	data->board = (int **)stock_malloc(sizeof(int *) * boardSize, mem);
 	if (!data->board) {
-		sem_signal(semid); return (1);
+		sem_signal(semid);
+		return (1);
 	}
 	for (int i = 0; i < boardSize; i++)
 	{
@@ -68,7 +80,53 @@ int		write_game_rules(t_shared_data *data, int semid, int playerCount, int board
 		for (int j = 0; j < boardSize; j++)
 			data->board[i][j] = 0;
 	}
+
+	if (sem_signal(semid) == -1) {
+		perror("sem_signal");
+		return -1;
+	}
+
 	return 0;
+}
+
+int check_connected_players(t_shared_data *data, int semid)
+{
+	int connected;
+
+	if (sem_wait(semid) == -1) {
+		perror("sem_wait check_connected_players");
+		return -1;
+	}
+
+	connected = data->connectedPlayers;
+
+	if (sem_signal(semid) == -1) {
+		perror("sem_signal");
+		return -1;
+	}
+
+	return connected;
+}
+
+int register_new_player(t_shared_data *data, int semid)
+{
+	int player_id;
+
+	if (sem_wait(semid) == -1) {
+		perror("sem_wait");
+		return -1;
+	}
+
+	data->connectedPlayers += 1;
+	player_id = data->connectedPlayers;
+
+	if (sem_signal(semid) == -1) {
+		perror("sem_signal");
+		return -1;
+	}
+	ft_printf("\033[7;49;92mINFO\033[0m : Player %d registered\n", player_id);
+
+	return player_id;
 }
 
 int create_or_join_semaphore(int initial_value, bool *is_creator)

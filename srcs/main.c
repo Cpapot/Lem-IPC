@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 17:15:54 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/19 20:44:48 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/04 16:49:16 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,8 @@ int main(void)
 
 	// gerer team avec argv[1] = team_id(int) entre 1 et 4 compris
 
-	shmData.semid = create_or_join_semaphore(0, &shmData.isHost);
+	shmData.semid = create_or_join_semaphore(1, &shmData.isHost);
+	printf("semid: %d\n", shmData.semid );
 	if (shmData.semid == -1)
 	{
 		ft_printf("%s Error: ipc_create_or_connect failed\n", ERROR_PRINT);
@@ -122,7 +123,31 @@ int main(void)
 	{			// client
 		ft_printf("%s Host already exists, joining...\n", INFO_PRINT);
 		ft_printf("%s Waiting for the host to define game rules and all players to join.\n", INFO_PRINT);
-		sem_wait(shmData.semid);
+		shmData.data = create_or_get_shared_memory(&shmData.shmid, false);
+		if (!shmData.data)
+		{
+			ft_printf("%s The host has not finished configuring the game, retry later.\n", INFO_PRINT);
+			return (1);
+		}
+		register_new_player(shmData.data, shmData.semid);
+		while(42)
+		{
+			sem_wait(shmData.semid);
+			if (shmData.data->gameStarted)
+			{
+				ft_printf("%s Game started, you can now play!\n", INFO_PRINT);
+				break;
+			}
+			if (shmData.data->isFinish)
+			{
+				ft_printf("%s The host has ended the game, exiting...\n", INFO_PRINT);
+				return (0);
+			}
+
+			sem_signal(shmData.semid);
+			usleep(100000); // sleep 100ms to avoid busy waiting
+		}
+		//sem_wait(shmData.semid);
 		/*
 			quand on se connecte deux possibilités sois le host est en train de faire ses trucs
 			pour le verifier on essaye de se connecter à la memoire partagée si on arrive sy connecter c'est que le deuxieme cas si on viens de la créer on la supprime et c'est le premier cas
@@ -136,5 +161,5 @@ int main(void)
 		*/
 		ft_printf("%s All players have joined game starting.\n", INFO_PRINT);
 	}
-	clean_shared_memory(shmData.shmid, shmData.semid, shmData.data, true);
+	// il faut clean uniquement l'host
 }

@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:25:40 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/19 20:43:05 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/04 15:52:18 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,31 @@
 # include "../inc/lem-ipc.h"
 # include "../inc/shared_memory.h"
 # include <stdio.h>
+# include <sys/time.h>
+# include <string.h>
+
+//NOT CLEAN MALLOC UNSECURE
 
 // page d'attente des joueurs
 // on affiche une page de loading avec un fond gris
 // on affiche le nombre de joueurs connectés/joueurs max
 // essayer de faire une animation de loading ('Waiting for players''Waiting for players.''Waiting for players..''Waiting for players...')
 
-static void add_player_count(int playerCount, int maxPlayerCount, t_mlx_page *page)
+typedef struct s_loading_data
+{
+	t_mlx_data *mlx_data;
+	int previous_count;
+	int last_update;
+} t_loading_data;
+
+static long		get_current_time_ms()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+static void		add_player_count(int playerCount, int maxPlayerCount, t_mlx_page *page)
 {
 	char buff[64];
 
@@ -29,20 +47,113 @@ static void add_player_count(int playerCount, int maxPlayerCount, t_mlx_page *pa
 	mlx_write_text_to_image(buff, WIN_WIDTH / 2, WIN_HEIGHT / 2 + 50, 2, true, &page->img);
 }
 
+// //NOT CLEAN MALLOC UNSECURE
+// void update_loading_text(t_mlx_page *page, int dots)
+// {
+// 	char loading_text[30];
+// 	int i;
+
+// 	strcpy(loading_text, "Waiting for players");
+// 	i = strlen(loading_text);
+
+// 	for (int j = 0; j < dots; j++)
+// 		loading_text[i++] = '.';
+// 	loading_text[i] = '\0';
+
+// 	set_image_color(&page->img, rgb_to_int(209, 207, 207));
+// 	mlx_write_text_to_image(loading_text, WIN_WIDTH / 2, WIN_HEIGHT / 2 - 100, 4, true, &page->img);
+// }
+
+void render_loading_page(void *pageData, t_mlx_data *mlxData)
+{
+	t_mlx_page *page = (t_mlx_page *)pageData;
+
+	int connected = check_connected_players(mlxData->shmData->data, mlxData->shmData->semid);
+	if (connected == -1) {
+		ft_putstr_fd("Error: check_connected_players failed\n", 2);
+		return;
+	}
+
+	set_image_color(&page->img, rgb_to_int(209, 207, 207));
+	mlx_write_text_to_image("Waiting for players", WIN_WIDTH / 2, WIN_HEIGHT / 2 - 100, 4, true, &page->img);
+	add_player_count(connected, mlxData->shmData->data->playerCount, page);
+	img_mlx_put_image_to_window(mlxData, &page->img);
+}
+
+static int check_players_loop(void *param)
+{
+    t_loading_data *load_data = (t_loading_data *)param;
+    t_mlx_data *mlx_data = load_data->mlx_data;
+    t_mlx_page *page = (t_mlx_page *)mlx_data->pages->content;
+    t_shared_data *shared_data = mlx_data->shmData->data;
+    int semid = mlx_data->shmData->semid;
+    long current_time = get_current_time_ms();
+
+    // Vérifier si une seconde s'est écoulée depuis le dernier rafraîchissement
+    if (current_time - load_data->last_update >= 1000) {
+
+        // Mise à jour de l'animation des points
+
+        // Vérifier si de nouveaux joueurs se sont connectés
+        int connected = check_connected_players(shared_data, semid);
+        if (connected == -1) {
+            ft_printf("%s Error checking connected players\n", ERROR_PRINT);
+            return (0);
+        }
+
+        // Si un nouveau joueur s'est connecté
+        if (connected > load_data->previous_count) {
+            ft_printf("%s New player connected! (%d/%d)\n",
+                INFO_PRINT, connected, shared_data->playerCount);
+            load_data->previous_count = connected;
+        }
+
+		render_loading_page(page, mlx_data);
+
+        // Si tous les joueurs sont connectés, commencer le jeu
+        if (connected >= shared_data->playerCount) {
+            ft_printf("%s All players connected! Starting game...\n", INFO_PRINT);
+            shared_data->gameStarted = true;
+            // Ici, vous devriez ajouter un code pour quitter la boucle mlx et passer à la page de jeu
+            // Par exemple, vous pourriez appeler une fonction qui change de page
+            return (1); // Retourne 1 pour arrêter la boucle
+        }
+		load_data->last_update = current_time;
+
+    }
+
+    return (0);
+}
+
 void loading_page(t_mlx_data *mlxData)
 {
-	ft_printf("%s Lauching loading page...\n", INFO_PRINT);
-	mlx_init_page(mlxData, "loading");
-	if (mlxData->pages == NULL)
-	{
-		ft_putstr_fd("Error: mlx_init_page failed\n", 2);
-		return ;
-	}
-	set_image_color(&((t_mlx_page *)mlxData->pages->content)->img, rgb_to_int(209, 207, 207));
-	mlx_write_text_to_image("Waiting for players", WIN_WIDTH / 2, WIN_HEIGHT / 2 - 100, 4, true, &((t_mlx_page *)mlxData->pages->content)->img);
-	add_player_count(1, 2, (t_mlx_page *)mlxData->pages->content);
-	img_mlx_put_image_to_window(mlxData, &((t_mlx_page *)mlxData->pages->content)->img);
-	mlx_loop(mlxData->mlx);
+    ft_printf("%s Launching loading page...\n", INFO_PRINT);
+    mlx_init_page(mlxData, "loading");
+    if (mlxData->pages == NULL) {
+        ft_putstr_fd("Error: mlx_init_page failed\n", 2);
+        return;
+    }
+
+    render_loading_page(mlxData->pages->content, mlxData);
+
+    // Configurer la structure de données pour la boucle de vérification
+    t_loading_data *load_data = malloc(sizeof(t_loading_data));
+    if (!load_data) {
+        ft_putstr_fd("Error: malloc failed\n", 2);
+        return;
+    }
+    load_data->mlx_data = mlxData;
+    load_data->previous_count = 1;
+    load_data->last_update = get_current_time_ms();
+
+    // Enregistrer la fonction de vérification périodique
+    mlx_loop_hook(mlxData->mlx, check_players_loop, load_data);
+
+    // Démarrer la boucle
+    mlx_loop(mlxData->mlx);
+
+    // Libérer la mémoire (ceci ne sera exécuté qu'après avoir quitté la boucle)
+    free(load_data);
 }	// on doit faire en sorte d'unlock la semaphore apres avoir affcihé la page et s'attendre a etre lock autant de fois qu'il y a de joueurs - 1(l'host)
       // a chaque unlock on incremente le nombre de joueurs connectés
 

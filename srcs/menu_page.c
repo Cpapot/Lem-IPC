@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 13:41:43 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/19 20:30:30 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/04 14:43:36 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,14 @@ int start_button(void *param)
 
 	ft_printf("%s Start button pressed\n%s Arena Size: %d\n%s Player Count: %d\n%s Speed: %d\n" \
 		, INFO_PRINT, INFO_PRINT, values[0], INFO_PRINT, values[1], INFO_PRINT, values[2]);
+
+	int semval;
+	if ((semval = semctl(data->shmData->semid, 0, GETVAL)) == -1) {
+		perror("semctl GETVAL");
+		mlx_free(data);
+	}
+	ft_printf("%s Current semaphore value: %d\n", DEBUG_PRINT, semval);
+
 
 	data->shmData->data = create_or_get_shared_memory(&data->shmData->shmid, true);
 	if (!data->shmData->data) {
@@ -77,6 +85,7 @@ void launch_menu(t_shared_data_manager *shmData)
 	t_mlx_data		*mlxData = mlx_init_window();
 
 	mlxData->shmData = shmData;
+	ft_printf("%s Shared memory manager initialized at: %p\n", DEBUG_PRINT, mlxData->shmData->semid);
 	if (mlx_init_page(mlxData, "menu"))
 		perror("mlx_init_page"), mlx_free(mlxData);
 

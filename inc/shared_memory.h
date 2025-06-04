@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:34:55 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/19 20:32:36 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/04 16:46:40 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,20 @@
 # include "../libft/includes/libft.h"
 
 
-# define SHM_KEY 1234
-# define SEM_KEY 5633
+# define SHM_KEY 1233
+# define SEM_KEY 5627
 
 union semun {
-	int val;
-	struct semid_ds *buf;
-	unsigned short *array;
+	int val;               /* Valeur pour SETVAL */
+	struct semid_ds *buf;  /* Buffer pour IPC_STAT, IPC_SET */
+	unsigned short *array; /* Array pour GETALL, SETALL */
+	struct seminfo *__buf; /* Buffer pour IPC_INFO */
 };
 
 typedef struct s_shared_data
 {
 	bool		gameStarted;
+	bool		isFinish;
 	int			boardSize;
 	int			playerCount;
 	int			connectedPlayers;
@@ -54,7 +56,10 @@ int				sem_signal(int semid);
 int				create_or_join_semaphore(int initial_value, bool *is_creator);
 t_shared_data	*create_or_get_shared_memory(int *shmid, bool create);
 int				write_game_rules(t_shared_data *data, int semid, int playerCount, int boardSize, int speed, t_memlist **mem);
-void			clean_shared_memory(int shmid, int semid, t_shared_data *data, bool isHost);
+void			clean_shared_memory(int shmid, t_shared_data *data, bool isHost);
 void			remove_semaphore(int semid, int is_host);
+int				register_new_player(t_shared_data *data, int semid);
+int				check_connected_players(t_shared_data *data, int semid);
+
 
 #endif
