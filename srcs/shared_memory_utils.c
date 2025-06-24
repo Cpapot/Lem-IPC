@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:34:40 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/04 16:46:55 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/24 19:35:12 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void		clean_shared_memory(int shmid, t_shared_data *data, bool isHost)
 	}
 }
 
+//changer ca en creant un tableau plat (boardSize * boardSize) et en le stockant dans la memoire partagée
 int		write_game_rules(t_shared_data *data, int semid, int playerCount, int boardSize, int speed, t_memlist **mem)
 {
 	data->gameStarted = false;
@@ -66,14 +67,15 @@ int		write_game_rules(t_shared_data *data, int semid, int playerCount, int board
 	data->connectedPlayers = 1;
 	data->speed = speed;
 
-	data->board = (int **)stock_malloc(sizeof(int *) * boardSize, mem);
+	data->board = (int **)stock_malloc(sizeof(int *) * boardSize + 1, mem);
+	printf("board: %p\n", data->board);
 	if (!data->board) {
 		sem_signal(semid);
 		return (1);
 	}
 	for (int i = 0; i < boardSize; i++)
 	{
-		data->board[i] = (int *)stock_malloc(sizeof(int) * boardSize, mem);
+		data->board[i] = (int *)stock_malloc(sizeof(int) * boardSize + 1, mem);
 		if (!data->board[i]) {
 			sem_signal(semid); return (1);
 		}

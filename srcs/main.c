@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 17:15:54 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/04 16:49:16 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/24 19:07:02 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 #include "../inc/ipc.h"
 #include <stdio.h>
 
+/*
+CE NEST PAS LHOST QUI CLEAN LA MEMOIRE PARTAGEE ET LES IPC MAIS LE LAST PLAYER
+*/
+
+int game_process(t_shared_data_manager *shmData, int semid, int team_id);
+
 int test_button1(void *param)
 {
 	(void)param;
@@ -22,71 +28,30 @@ int test_button1(void *param)
 	return (0);
 }
 
-// int test_button2(t_mlx_data *mlxData)
-// {
-// 	if (mlx_init_page(mlxData))
-// 		return (ft_putstr_fd("Error: mlx_init_page failed\n", 2), 1);
-
-
-// 	int color = rgb_to_int(209, 207, 207);
-// 	for (int i = 0; i < WIN_WIDTH; i++)
-// 	{
-// 		for (int j = 0; j < WIN_HEIGHT; j++)
-// 		{
-// 			img_mlx_pixel_put(&((t_mlx_page *)mlxData->pages->content)->img, i, j, (int)color);
-// 		}
-// 	}
-// 	// mlx_create_button(mlxData->pages->content, (unsigned int[6]){0, 0, 200, 50, 0xA6A6A6, 0x6B6B6B}, "START", test_button1, NULL);
-// 	mlx_create_button(mlxData->pages->content, (unsigned int[6]){700, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Exit", mlx_free, mlxData);
-
-// 	if (mlx_render_all_button(mlxData->pages->content, mlxData))
-// 	{
-// 		ft_putstr_fd("Error: mlx_render_all_button failed\n", 2);
-// 		return (1);
-// 	}
-
-// 	img_mlx_put_image_to_window(mlxData, &((t_mlx_page *)mlxData->pages->content)->img);
-// 	return (0);
-// }
-
-// int main(void)
-// {
-// 	t_mlx_data		*mlxData = mlx_init_window();
-
-// 	if (!mlxData)
-// 		return (ft_putstr_fd("Error: mlx_init_window failed\n", 2), 1);
-
-// 	if (mlx_init_page(mlxData))
-// 		return (ft_putstr_fd("Error: mlx_init_page failed\n", 2), 1);
-
-// 	mlx_create_button(mlxData->pages->content, (unsigned int[6]){200, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Start", test_button1, NULL);
-// 	mlx_create_button(mlxData->pages->content, (unsigned int[6]){400, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Change page", test_button2, mlxData);
-// 	mlx_create_button(mlxData->pages->content, (unsigned int[6]){700, 100, 200, 50, 0xA6A6A6, 0x6B6B6B}, "Exit", mlx_free, mlxData);
-
-
-// 	int color = rgb_to_int(209, 207, 207);
-// 	for (int i = 0; i < WIN_WIDTH; i++)
-// 	{
-// 		for (int j = 0; j < WIN_HEIGHT; j++)
-// 		{
-// 			img_mlx_pixel_put(&((t_mlx_page *)mlxData->pages->content)->img, i, j, (int)color);
-// 		}
-// 	}
-// 	if (mlx_render_all_button(mlxData->pages->content, mlxData))
-// 	{
-// 		ft_putstr_fd("Error: mlx_render_all_button failed\n", 2);
-// 		return (1);
-// 	}
-// 	img_mlx_put_image_to_window(mlxData, &((t_mlx_page *)mlxData->pages->content)->img);
-// 	mlx_hooks_init(mlxData);
-// 	mlx_loop(mlxData->mlx);
-// 	//ft_printf("Hello, World!\n");
-// }
-
 void launch_menu(t_shared_data_manager *shmData);
 
-int main(void)
+int team_id_from_argv(int argc, char **argv)
 {
+	if (argc < 2)
+	{
+		ft_printf_fd(1, "%s Error: No team ID provided. Please provide a team ID between 1 and 4.\n", ERROR_PRINT);
+		return (-1);
+	}
+	int team_id = ft_atoi(argv[1]);
+	if (team_id < 1 || team_id > 4)
+	{
+		ft_printf_fd(1, "%s Error: Invalid team ID %d. Please provide a team ID between 1 and 4.\n", ERROR_PRINT, team_id);
+		return (-1);
+	}
+	return (team_id);
+}
+
+int main(int argc, char **argv)
+{
+	int teamId = team_id_from_argv(argc, argv);
+	if (teamId == -1)
+		return (1);
+
 	// on verifie si la queue de message existe déjà
 
 	// si oui on n'est pas l'host
@@ -160,6 +125,7 @@ int main(void)
 				unclock la memoire partagée
 		*/
 		ft_printf("%s All players have joined game starting.\n", INFO_PRINT);
+		game_process(&shmData, shmData.semid, teamId);
 	}
 	// il faut clean uniquement l'host
 }

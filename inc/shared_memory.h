@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:34:55 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/04 16:46:40 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/24 19:30:30 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 # include "../libft/includes/libft.h"
 
 
-# define SHM_KEY 1233
-# define SEM_KEY 5627
+# define SHM_KEY 1232
+# define SEM_KEY 5622
 
 union semun {
 	int val;               /* Valeur pour SETVAL */
@@ -40,7 +40,7 @@ typedef struct s_shared_data
 	int			playerCount;
 	int			connectedPlayers;
 	int			speed;
-	int			**board; //[][] 0 = vide, ou si != 0 id du joueur
+	int			**board; //[][] 0 = vide, ou si != 0 id de lekip
 }		t_shared_data;
 
 typedef struct s_shared_data_manager

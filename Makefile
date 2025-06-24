@@ -23,7 +23,8 @@ SRCS			=	main.c							\
 					mlx_utils/mlx_images_utils.c	\
 					mlx_utils/mlx_page.c			\
 					mlx_utils/mlx_text.c			\
-					mlx_utils/mlx_slider.c
+					mlx_utils/mlx_slider.c			\
+					game_process.c					\
 
 LIBFTSRC		=	libftprintf.a libft.a printffd.a
 
