@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:11:53 by cpapot            #+#    #+#             */
-/*   Updated: 2025/05/19 19:47:11 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 18:01:00 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include "lem-ipc.h"
 # include "shared_memory.h"
+# include <sys/time.h>
 
 # define WIN_WIDTH 1080
 # define WIN_HEIGHT 720
@@ -90,6 +91,14 @@ typedef struct s_mlx_page {
 	void			(*render)(void *pageData, t_mlx_data *mlxData);
 }	t_mlx_page;
 
+typedef struct s_rerender_data
+{
+	t_mlx_data *mlx_data;
+	int previous_count;
+	int last_update;
+} t_rerender_data;
+
+long			get_current_time_ms();
 int				mlx_button_hook(int button, int x, int y, t_mlx_page *page);
 int				mlx_init_page(t_mlx_data *mlxData, char *name);
 void			img_mlx_pixel_put(t_image_data *data, int x, int y, int color);

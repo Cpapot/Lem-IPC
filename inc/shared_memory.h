@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:34:55 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/24 19:30:30 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 18:45:30 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 
 # define SHM_KEY 1232
-# define SEM_KEY 5622
+# define SEM_KEY 5604
 
 union semun {
 	int val;               /* Valeur pour SETVAL */
@@ -40,15 +40,23 @@ typedef struct s_shared_data
 	int			playerCount;
 	int			connectedPlayers;
 	int			speed;
-	int			**board; //[][] 0 = vide, ou si != 0 id de lekip
+	int			board[1000]; //[] 0 = vide, ou si != 0 id de lekip
 }		t_shared_data;
+
+typedef struct s_player_postion {
+	int x;
+	int y;
+} t_player_position;
 
 typedef struct s_shared_data_manager
 {
-	bool			isHost;
-	int				shmid;
-	int				semid;
-	t_shared_data	*data;
+	t_memlist			*localeGameData;
+	bool				isHost;
+	int					hostTeamId;
+	int					shmid;
+	int					semid;
+	t_player_position	*actualPlayerPosition;
+	t_shared_data		*data;
 }		t_shared_data_manager;
 
 int				sem_wait(int semid);

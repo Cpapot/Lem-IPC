@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:34:40 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/24 19:35:12 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 15:33:16 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,22 +67,14 @@ int		write_game_rules(t_shared_data *data, int semid, int playerCount, int board
 	data->connectedPlayers = 1;
 	data->speed = speed;
 
-	data->board = (int **)stock_malloc(sizeof(int *) * boardSize + 1, mem);
+	// data->board = (int *)stock_malloc(sizeof(int) * boardSize * boardSize, mem);
+	*mem = NULL; // Pour éviter un warning si mem n'est pas utilisé
 	printf("board: %p\n", data->board);
 	if (!data->board) {
 		sem_signal(semid);
 		return (1);
 	}
-	for (int i = 0; i < boardSize; i++)
-	{
-		data->board[i] = (int *)stock_malloc(sizeof(int) * boardSize + 1, mem);
-		if (!data->board[i]) {
-			sem_signal(semid); return (1);
-		}
-		for (int j = 0; j < boardSize; j++)
-			data->board[i][j] = 0;
-	}
-
+	ft_bzero(data->board, sizeof(int) * boardSize * boardSize);
 	if (sem_signal(semid) == -1) {
 		perror("sem_signal");
 		return -1;

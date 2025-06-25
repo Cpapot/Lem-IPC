@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 16:25:40 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/04 15:52:18 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 17:46:22 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,9 @@
 # include "../inc/lem-ipc.h"
 # include "../inc/shared_memory.h"
 # include <stdio.h>
-# include <sys/time.h>
 # include <string.h>
+
+void launch_game_page(t_mlx_data *mlxData);
 
 //NOT CLEAN MALLOC UNSECURE
 
@@ -25,19 +26,6 @@
 // on affiche le nombre de joueurs connectés/joueurs max
 // essayer de faire une animation de loading ('Waiting for players''Waiting for players.''Waiting for players..''Waiting for players...')
 
-typedef struct s_loading_data
-{
-	t_mlx_data *mlx_data;
-	int previous_count;
-	int last_update;
-} t_loading_data;
-
-static long		get_current_time_ms()
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-}
 
 static void		add_player_count(int playerCount, int maxPlayerCount, t_mlx_page *page)
 {
@@ -82,17 +70,15 @@ void render_loading_page(void *pageData, t_mlx_data *mlxData)
 
 static int check_players_loop(void *param)
 {
-    t_loading_data *load_data = (t_loading_data *)param;
-    t_mlx_data *mlx_data = load_data->mlx_data;
-    t_mlx_page *page = (t_mlx_page *)mlx_data->pages->content;
-    t_shared_data *shared_data = mlx_data->shmData->data;
-    int semid = mlx_data->shmData->semid;
+    t_rerender_data *load_data = (t_rerender_data *)param;
     long current_time = get_current_time_ms();
 
     // Vérifier si une seconde s'est écoulée depuis le dernier rafraîchissement
     if (current_time - load_data->last_update >= 1000) {
-
-        // Mise à jour de l'animation des points
+		t_mlx_data *mlx_data = load_data->mlx_data;
+		t_mlx_page *page = (t_mlx_page *)mlx_data->pages->content;
+		t_shared_data *shared_data = mlx_data->shmData->data;
+		int semid = mlx_data->shmData->semid;
 
         // Vérifier si de nouveaux joueurs se sont connectés
         int connected = check_connected_players(shared_data, semid);
@@ -110,16 +96,16 @@ static int check_players_loop(void *param)
 
 		render_loading_page(page, mlx_data);
 
-        // Si tous les joueurs sont connectés, commencer le jeu
-        if (connected >= shared_data->playerCount) {
-            ft_printf("%s All players connected! Starting game...\n", INFO_PRINT);
-            shared_data->gameStarted = true;
-            // Ici, vous devriez ajouter un code pour quitter la boucle mlx et passer à la page de jeu
-            // Par exemple, vous pourriez appeler une fonction qui change de page
-            return (1); // Retourne 1 pour arrêter la boucle
-        }
-		load_data->last_update = current_time;
+		if (connected >= shared_data->playerCount) {
+			ft_printf("%s All players connected! Starting game...\n", INFO_PRINT);
+			shared_data->gameStarted = true;
+			mlx_loop_hook(mlx_data->mlx, NULL, NULL);
+			mlx_free_page(mlx_data, page);
+			launch_game_page(mlx_data);
+			return (1);
+		}
 
+		load_data->last_update = current_time;
     }
 
     return (0);
@@ -137,7 +123,7 @@ void loading_page(t_mlx_data *mlxData)
     render_loading_page(mlxData->pages->content, mlxData);
 
     // Configurer la structure de données pour la boucle de vérification
-    t_loading_data *load_data = malloc(sizeof(t_loading_data));
+    t_rerender_data *load_data = stock_malloc(sizeof(t_rerender_data), &((t_mlx_page *)mlxData->pages->content)->memlist);
     if (!load_data) {
         ft_putstr_fd("Error: malloc failed\n", 2);
         return;

@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 13:41:43 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/04 14:43:36 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 16:32:27 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void launch_menu(t_shared_data_manager *shmData)
 	int player = 0;
 	int speed = 0;
 	mlx_create_slider(mlxData->pages->content, (unsigned int[10]){100, 450, 300, 10, 0xA6A6A6, 0x6B6B6B, 4, 100, 20, 1}, &size, "Arena Size:");
-	mlx_create_slider(mlxData->pages->content, (unsigned int[10]){100, 300, 300, 10, 0xA6A6A6, 0x6B6B6B, 2, 16, 4, 1}, &player, "Player Count:");
+	mlx_create_slider(mlxData->pages->content, (unsigned int[10]){100, 300, 300, 10, 0xA6A6A6, 0x6B6B6B, 4, 16, 4, 1}, &player, "Player Count:");
 	mlx_create_slider(mlxData->pages->content, (unsigned int[10]){100, 600, 300, 10, 0xA6A6A6, 0x6B6B6B, 1, 5, 3, 1}, &speed, "Speed:");
 	mlx_create_button(mlxData->pages->content, (unsigned int[6]){100, 100, 300, 50, 0xA6A6A6, rgb_to_int(77, 255, 136)}, "START", start_button, mlxData);
 	((t_mlx_page *)mlxData->pages->content)->render = render_menu;

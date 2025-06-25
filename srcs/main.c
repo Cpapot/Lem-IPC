@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 17:15:54 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/24 19:07:02 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 18:20:27 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 CE NEST PAS LHOST QUI CLEAN LA MEMOIRE PARTAGEE ET LES IPC MAIS LE LAST PLAYER
 */
 
-int game_process(t_shared_data_manager *shmData, int semid, int team_id);
+int game_process(t_shared_data_manager *shmData, int team_id);
 
 int test_button1(void *param)
 {
@@ -71,7 +71,6 @@ int main(int argc, char **argv)
 	// gerer team avec argv[1] = team_id(int) entre 1 et 4 compris
 
 	shmData.semid = create_or_join_semaphore(1, &shmData.isHost);
-	printf("semid: %d\n", shmData.semid );
 	if (shmData.semid == -1)
 	{
 		ft_printf("%s Error: ipc_create_or_connect failed\n", ERROR_PRINT);
@@ -81,6 +80,7 @@ int main(int argc, char **argv)
 	{			// host
 			//ipc_receive_message(&ipc);
 			//ipc_send_message(&ipc, "Je suis l'hôte !");
+		shmData.hostTeamId = teamId;
 		ft_printf("%s Semaphore created\n", DEBUG_PRINT);
 		launch_menu(&shmData);
 	}
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 		register_new_player(shmData.data, shmData.semid);
 		while(42)
 		{
-			sem_wait(shmData.semid);
+			// sem_wait(shmData.semid);
 			if (shmData.data->gameStarted)
 			{
 				ft_printf("%s Game started, you can now play!\n", INFO_PRINT);
@@ -109,8 +109,8 @@ int main(int argc, char **argv)
 				return (0);
 			}
 
-			sem_signal(shmData.semid);
-			usleep(100000); // sleep 100ms to avoid busy waiting
+			// sem_signal(shmData.semid);
+			// usleep(100000);
 		}
 		//sem_wait(shmData.semid);
 		/*
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 				unclock la memoire partagée
 		*/
 		ft_printf("%s All players have joined game starting.\n", INFO_PRINT);
-		game_process(&shmData, shmData.semid, teamId);
+		game_process(&shmData, teamId);
 	}
 	// il faut clean uniquement l'host
 }

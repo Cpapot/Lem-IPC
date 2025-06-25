@@ -9,7 +9,8 @@ HEADERS			=	lem-ipc.h		\
 					mlx_utils.h		\
 					mlx_font.h		\
 					ipc.h			\
-					shared_memory.h
+					shared_memory.h	\
+					game_process.h	\
 
 SRCS			=	main.c							\
 					menu_page.c						\
@@ -25,6 +26,8 @@ SRCS			=	main.c							\
 					mlx_utils/mlx_text.c			\
 					mlx_utils/mlx_slider.c			\
 					game_process.c					\
+					game_page.c						\
+					game_clean.c
 
 LIBFTSRC		=	libftprintf.a libft.a printffd.a
 

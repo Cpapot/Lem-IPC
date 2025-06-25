@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:12:34 by cpapot            #+#    #+#             */
-/*   Updated: 2025/06/04 16:49:27 by cpapot           ###   ########.fr       */
+/*   Updated: 2025/06/25 18:00:53 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,3 +78,9 @@ int		mlx_free(t_mlx_data *mlxData)
 	return (0);
 }
 
+long		get_current_time_ms()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
